@@ -1,9 +1,11 @@
 import {configureStore} from '@reduxjs/toolkit';
 import searchReducer from './search-slice';
 import placeReducer from './place-slice';
+import historyReducer from './history-slice';
 
 export const store = configureStore({
   reducer: {
+    history: historyReducer,
     search: searchReducer,
     place: placeReducer,
   },

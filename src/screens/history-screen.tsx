@@ -1,11 +1,6 @@
 import React, {useCallback} from 'react';
-import InputForm from '../components/input-form';
-import {useDispatch, useSelector} from 'react-redux';
-import {searchActions, searchSelector} from '../stores/search-slice';
-import {debounce} from 'lodash';
-import {AppDispatch} from '../stores';
+import {useSelector} from 'react-redux';
 import {
-  ActivityIndicator,
   FlatList,
   ListRenderItem,
   StyleSheet,
@@ -20,28 +15,18 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootParamList} from '../navigator/root-navigator';
-import {addHistory} from '../stores/history-slice';
+import {historySelector} from '../stores/history-slice';
 
 type Navigation = NativeStackNavigationProp<RootParamList>;
 
-function HomeScreen() {
+function HistoryScreen() {
   const navigation = useNavigation<Navigation>();
-  const dispatch = useDispatch<AppDispatch>();
-  const {searching, predictions, error} = useSelector(searchSelector);
-
-  const search = debounce((text: string) => {
-    const input = text.trim();
-
-    dispatch(searchActions.autocomplete({input}));
-  }, 500);
+  const history = useSelector(historySelector);
 
   const renderItem: ListRenderItem<Prediction> = useCallback(({item}) => {
     return (
       <TouchableOpacity
-        onPress={() => {
-          dispatch(addHistory(item));
-          navigation.navigate('map', {placeId: item.place_id});
-        }}>
+        onPress={() => navigation.navigate('map', {placeId: item.place_id})}>
         <View style={{gap: 8, flexDirection: 'row', alignItems: 'center'}}>
           <Icon name="locate" size={22} color="#DD2534" />
           <View style={{gap: 4, flex: 1}}>
@@ -59,60 +44,34 @@ function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <NavBar
-        title="Home"
-        iconRight={{name: 'time-outline'}}
-        iconRightOnPress={() => navigation.navigate('history')}
-      />
-      <InputForm
-        placeholder="Search"
-        clearButtonMode="while-editing"
-        onChangeText={search}
-      />
+      <NavBar back title="History" />
       <FlatList
-        data={predictions}
+        data={history}
         renderItem={renderItem}
         keyExtractor={item => item.place_id}
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: predictions.length > 0 ? 'flex-start' : 'center',
+          justifyContent: history.length > 0 ? 'flex-start' : 'center',
           gap: 20,
           paddingBottom: 24,
         }}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          searching ? (
-            <ActivityIndicator size="large" />
-          ) : error ? (
-            <Error />
-          ) : (
-            <Empty />
-          )
-        }
+        ListEmptyComponent={<Empty />}
       />
     </SafeAreaView>
   );
 }
 
-const Error = () => {
-  return (
-    <View style={styles.empty}>
-      <Icon name="alert" size={72} color="#DD2534" />
-      <Text style={styles.emptyBody}>Can't find your location</Text>
-    </View>
-  );
-};
-
 const Empty = () => {
   return (
     <View style={styles.empty}>
-      <Icon name="search" size={72} />
-      <Text style={styles.emptyBody}>Search your location</Text>
+      <Icon name="cloud-offline-outline" size={72} />
+      <Text style={styles.emptyBody}>No history yet</Text>
     </View>
   );
 };
 
-export default HomeScreen;
+export default HistoryScreen;
 
 const styles = StyleSheet.create({
   screen: {
