@@ -10,14 +10,21 @@ import {
   ListRenderItem,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {Prediction} from '../types/place';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import NavBar from '../components/nav-bar';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootParamList} from '../navigator/root-navigator';
+
+type Navigation = NativeStackNavigationProp<RootParamList>;
 
 function HomeScreen() {
+  const navigation = useNavigation<Navigation>();
   const dispatch = useDispatch<AppDispatch>();
   const {searching, predictions, error} = useSelector(searchSelector);
 
@@ -29,19 +36,23 @@ function HomeScreen() {
 
   const renderItem: ListRenderItem<Prediction> = useCallback(({item}) => {
     return (
-      <View style={{gap: 8, flexDirection: 'row', alignItems: 'center'}}>
-        <Icon name="locate" size={22} color="#DD2534" />
-        <View style={{gap: 4, flex: 1}}>
-          <Text style={{fontWeight: '600'}}>
-            {item.structured_formatting.main_text}
-          </Text>
-          <Text style={{fontSize: 12, fontWeight: '200'}}>
-            {item.structured_formatting.secondary_text}
-          </Text>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('map', {placeId: item.place_id})}>
+        <View style={{gap: 8, flexDirection: 'row', alignItems: 'center'}}>
+          <Icon name="locate" size={22} color="#DD2534" />
+          <View style={{gap: 4, flex: 1}}>
+            <Text style={{fontWeight: '600'}}>
+              {item.structured_formatting.main_text}
+            </Text>
+            <Text style={{fontSize: 12, fontWeight: '200'}}>
+              {item.structured_formatting.secondary_text}
+            </Text>
+          </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }, []);
+
   return (
     <SafeAreaView style={styles.screen}>
       <NavBar title="Home" />
