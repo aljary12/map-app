@@ -20,10 +20,11 @@ export const historySlice = createSlice({
         state.history.pop(); // remove the last element (oldest)
       }
     },
+    clearHistory: () => initialState,
   },
 });
 
-export const {addHistory} = historySlice.actions;
+export const {addHistory, clearHistory} = historySlice.actions;
 
 export const historySelector = (state: RootState) => state.history.history;
 

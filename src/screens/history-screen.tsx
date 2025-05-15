@@ -1,5 +1,5 @@
 import React, {useCallback} from 'react';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   FlatList,
   ListRenderItem,
@@ -15,11 +15,12 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootParamList} from '../navigator/root-navigator';
-import {historySelector} from '../stores/history-slice';
+import {clearHistory, historySelector} from '../stores/history-slice';
 
 type Navigation = NativeStackNavigationProp<RootParamList>;
 
 function HistoryScreen() {
+  const dispatch = useDispatch();
   const navigation = useNavigation<Navigation>();
   const history = useSelector(historySelector);
 
@@ -44,7 +45,12 @@ function HistoryScreen() {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <NavBar back title="History" />
+      <NavBar
+        back
+        title="History"
+        iconRight={{name: 'trash-outline'}}
+        iconRightOnPress={() => dispatch(clearHistory())}
+      />
       <FlatList
         data={history}
         renderItem={renderItem}
