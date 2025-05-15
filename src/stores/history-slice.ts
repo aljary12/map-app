@@ -15,6 +15,14 @@ export const historySlice = createSlice({
   initialState,
   reducers: {
     addHistory: (state, action: PayloadAction<Prediction>) => {
+      const index = state.history.findIndex(
+        history => history.place_id === action.payload?.place_id,
+      );
+
+      if (index >= 0) {
+        state.history.splice(index, 1);
+      }
+
       state.history.unshift(action.payload); // add new element to the front
       if (state.history.length >= 10) {
         state.history.pop(); // remove the last element (oldest)

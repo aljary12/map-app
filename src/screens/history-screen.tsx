@@ -1,46 +1,19 @@
 import React, {useCallback} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {
-  FlatList,
-  ListRenderItem,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {FlatList, ListRenderItem, StyleSheet, Text, View} from 'react-native';
 import {Prediction} from '../types/place';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import NavBar from '../components/nav-bar';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootParamList} from '../navigator/root-navigator';
 import {clearHistory, historySelector} from '../stores/history-slice';
-
-type Navigation = NativeStackNavigationProp<RootParamList>;
+import PlaceCard from '../components/place-card';
 
 function HistoryScreen() {
   const dispatch = useDispatch();
-  const navigation = useNavigation<Navigation>();
   const history = useSelector(historySelector);
 
   const renderItem: ListRenderItem<Prediction> = useCallback(({item}) => {
-    return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate('map', {placeId: item.place_id})}>
-        <View style={{gap: 8, flexDirection: 'row', alignItems: 'center'}}>
-          <Icon name="locate" size={22} color="#DD2534" />
-          <View style={{gap: 4, flex: 1}}>
-            <Text style={{fontWeight: '600'}}>
-              {item.structured_formatting.main_text}
-            </Text>
-            <Text style={{fontSize: 12, fontWeight: '200'}}>
-              {item.structured_formatting.secondary_text}
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
+    return <PlaceCard {...item} />;
   }, []);
 
   return (
